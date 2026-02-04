@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36301.6 d17.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ffmpegCutter", "ffmpegCutter.csproj", "{B86F468A-10F1-4BB8-AB85-CEBD12FE0CAC}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B86F468A-10F1-4BB8-AB85-CEBD12FE0CAC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B86F468A-10F1-4BB8-AB85-CEBD12FE0CAC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B86F468A-10F1-4BB8-AB85-CEBD12FE0CAC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B86F468A-10F1-4BB8-AB85-CEBD12FE0CAC}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {6750AF09-AF35-4CB8-B7CF-1BA7D7675A50}
+	EndGlobalSection
+EndGlobal
