@@ -10,7 +10,9 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Microsoft.Win32;
 using System.IO;
+using System.IO.Compression;
 using System.Diagnostics;
+using System.Net.Http;
 
 namespace ffmpegCutter
 {
@@ -31,10 +33,33 @@ namespace ffmpegCutter
         {
             var path = Properties.Settings.Default.FfmpegPath;
 
-            if (string.IsNullOrEmpty(path) || !File.Exists(path))
+            if (!string.IsNullOrEmpty(path) && File.Exists(path))
             {
-                MessageBox.Show("ffmpegのパスが設定されていないか、存在しません。設定メニューから設定してください。", "警告", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
             }
+
+            var result = MessageBox.Show(
+                "ffmpegのパスが設定されていません。設定しますか？\n\n" + 
+                "「はい」：自動ダウンロード\n" +
+                "「いいえ」手動で指定\n：" + 
+                "「キャンセル」：アプリ終了",
+                "ffmpegのパス未設定",
+                MessageBoxButton.YesNoCancel,
+                MessageBoxImage.Question);
+
+            if (result == MessageBoxResult.Yes)
+            {
+                DownloadFfmpeg();
+            }
+            else if (result == MessageBoxResult.No)
+            {
+                Menu_SetFfmpegPath_Click(this, new RoutedEventArgs());
+            }
+            else
+            {
+                Application.Current.Shutdown();
+            }
+
         }
 
         // ドラッグ中のイベント
@@ -106,6 +131,49 @@ namespace ffmpegCutter
 
             }
         }
+
+        // メニュー/設定/ffmpegの自動ダウンロード
+        private void Menu_DownloadFfmpeg_Click(object sender, RoutedEventArgs e)
+        {
+            DownloadFfmpeg();
+        }
+
+        // メニュー/設定/ffmpeg情報
+        private void Menu_ShowFfmpegInfo_Click(object sender, RoutedEventArgs e)
+        {
+            var path = Properties.Settings.Default.FfmpegPath;
+
+            if (string.IsNullOrEmpty(path) || !File.Exists(path))
+            {
+                MessageBox.Show("ffmpegのパスが設定されていないか、存在しません。", "エラー", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+            var psi = new ProcessStartInfo
+            {
+                FileName = path,
+                ArgumentList = { "-version" },
+                RedirectStandardOutput = true,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            };
+            try
+            {
+                var process = Process.Start(psi);
+                if (process == null)
+                {
+                    MessageBox.Show("ffmpegのプロセスを開始できませんでした。", "エラー", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+                var output = process.StandardOutput.ReadToEnd();
+                process.WaitForExit();
+                MessageBox.Show(output, "ffmpeg情報", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("ffmpeg情報の取得中にエラーが発生しました。\n" + ex.Message, "エラー", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
 
         // メニュー/ファイル/終了
         private void Menu_File_Exit_Click(object sender, RoutedEventArgs e)
@@ -248,9 +316,65 @@ namespace ffmpegCutter
             InputFileBox.Text = path;
         }
 
-        private void MenuItem_Click(object sender, RoutedEventArgs e)
+        // ffmpegダウンロード関数
+        private async void DownloadFfmpeg()
         {
+            try
+            {
+                ExecuteButton.IsEnabled = false;
 
+                var exeDir = AppDomain.CurrentDomain.BaseDirectory;
+                var ffmpegPath = System.IO.Path.Combine(exeDir, "ffmpeg.exe");
+
+                if (File.Exists(ffmpegPath))
+                {
+                    Properties.Settings.Default.FfmpegPath = ffmpegPath;
+                    Properties.Settings.Default.Save();
+                    MessageBox.Show("既にffmpeg.exeが存在します。", "情報", MessageBoxButton.OK, MessageBoxImage.Information);
+                    return;
+                }
+
+                // 配付元（固定）
+                var url = "https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip";
+
+                var zipPath = System.IO.Path.Combine(exeDir, "ffmpeg.zip");
+                var extractDir = System.IO.Path.Combine(exeDir, "ffmpeg_temp");
+
+                using var client = new HttpClient();
+                var data = await client.GetByteArrayAsync(url);
+
+                await File.WriteAllBytesAsync(zipPath, data);
+
+                ZipFile.ExtractToDirectory(zipPath, extractDir);
+
+                var exe = Directory.GetFiles(extractDir, "ffmpeg.exe", SearchOption.AllDirectories).FirstOrDefault();
+
+                if (exe == null)
+                {
+                    MessageBox.Show("ffmpeg.exeがアーカイブ内に見つかりませんでした。", "エラー", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+
+                File.Copy(exe, ffmpegPath);
+
+                Directory.Delete(extractDir, true);
+                File.Delete(zipPath);
+
+                Properties.Settings.Default.FfmpegPath = ffmpegPath;
+                Properties.Settings.Default.Save();
+
+                MessageBox.Show("ffmpegのダウンロードと設定が完了しました。", "情報", MessageBoxButton.OK, MessageBoxImage.Information);
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("ffmpegのダウンロード中にエラーが発生しました。\n" + ex.Message, "エラー", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            finally
+            {
+                ExecuteButton.IsEnabled = true;
+            }
         }
+
     }
 }

@@ -26,6 +26,11 @@
             <MenuItem Header="設定">
                 <MenuItem Header="ffmpegパス設定"
                           Click="Menu_SetFfmpegPath_Click"/>
+                <MenuItem Header="ffmpegを自動ダウンロード"
+                          Click="Menu_DownloadFfmpeg_Click"/>
+                <Separator/>
+                <MenuItem Header="ffmpeg情報"
+                          Click="Menu_ShowFfmpegInfo_Click"/>
             </MenuItem>
         </Menu>
 
@@ -66,5 +71,15 @@
                 />
 
         </StackPanel>
+
+        <ProgressBar 
+            Name="ProgressBar"
+            Grid.Row="2"
+            Height="20"
+            Margin="0,10,0,0"
+            Minimum="0"
+            Maximum="100"
+            Visibility="Collapsed"
+            />
     </Grid>
 </Window>
