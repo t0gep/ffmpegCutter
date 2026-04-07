@@ -34,5 +34,17 @@ namespace ffmpegCutter.Properties {
                 this["FfmpegPath"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool TopMostEnabled {
+            get {
+                return ((bool)(this["TopMostEnabled"]));
+            }
+            set {
+                this["TopMostEnabled"] = value;
+            }
+        }
     }
 }

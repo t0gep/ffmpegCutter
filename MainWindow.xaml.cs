@@ -25,6 +25,17 @@ namespace ffmpegCutter
         {
             InitializeComponent();
             CheckFfmpegOnStartup();
+
+            // 設定をロード
+            Loaded += MainWindow_Loaded;
+        }
+
+        private void MainWindow_Loaded(object sender, RoutedEventArgs e)
+        {
+            // 最前面に表示の設定を反映
+            var topMost = Properties.Settings.Default.TopMostEnabled;
+            this.Topmost = topMost;
+            MenuTopMostItem.IsChecked = topMost;
         }
 
 
@@ -182,12 +193,24 @@ namespace ffmpegCutter
         }
 
         // メニュー/表示/最前面に表示
-        private void Menu_Show_Click(object sender, RoutedEventArgs e)
+        private void Menu_Show_Topmost_Click(object sender, RoutedEventArgs e)
         {
             var item = (MenuItem)sender;
             this.Topmost = item.IsChecked;
+
+            // Settingsに保存
+            Properties.Settings.Default.TopMostEnabled = item.IsChecked;
+            Properties.Settings.Default.Save();
         }
 
+        // メニュー/表示/テンキーを表示
+        private void Menu_Show_Keypad_Click(object sender, RoutedEventArgs e)
+        {
+            var item = (MenuItem)sender;
+            KeypadGrid.Visibility = item.IsChecked
+                ? Visibility.Visible
+                : Visibility.Collapsed;
+        }
 
         // 実行ボタンのクリックイベント
         private async void ExecuteButton_Click(object sender, RoutedEventArgs e)
@@ -253,6 +276,33 @@ namespace ffmpegCutter
             {
                 ExecuteButton.IsEnabled = true;
             }
+        }
+
+        // テンキーのイベントハンドラ
+        // 数字入力
+        private void Keypad_Click(object sender, RoutedEventArgs e)
+        {
+            var button = (Button)sender;
+            var digit = button.Content.ToString();
+            
+            var current = StartTimeBox.Text ?? "";
+
+            if (current.Length >= 6)
+            {
+                return;
+            }
+
+            StartTimeBox.Text = current + digit;
+        }
+        // バックスペース
+        private void Keypad_Backspace_Click(object sender, RoutedEventArgs e)
+        {
+            var current = StartTimeBox.Text ?? "";
+            if (current.Length == 0)
+            {
+                return;
+            }
+            StartTimeBox.Text = current.Substring(0, current.Length - 1);
         }
 
         // ここまで、イベントハンドラなど
