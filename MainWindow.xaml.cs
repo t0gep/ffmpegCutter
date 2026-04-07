@@ -181,6 +181,13 @@ namespace ffmpegCutter
             Application.Current.Shutdown();
         }
 
+        // メニュー/表示/最前面に表示
+        private void Menu_Show_Click(object sender, RoutedEventArgs e)
+        {
+            var item = (MenuItem)sender;
+            this.Topmost = item.IsChecked;
+        }
+
 
         // 実行ボタンのクリックイベント
         private async void ExecuteButton_Click(object sender, RoutedEventArgs e)

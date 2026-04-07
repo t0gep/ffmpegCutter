@@ -23,6 +23,7 @@
                 <MenuItem Header="終了"
                           Click="Menu_File_Exit_Click"/>
             </MenuItem>
+            
             <MenuItem Header="設定">
                 <MenuItem Header="ffmpegパス設定"
                           Click="Menu_SetFfmpegPath_Click"/>
@@ -31,6 +32,12 @@
                 <Separator/>
                 <MenuItem Header="ffmpeg情報"
                           Click="Menu_ShowFfmpegInfo_Click"/>
+            </MenuItem>
+            
+            <MenuItem Header="表示">
+                <MenuItem Header="最前面に表示"
+                          IsCheckable="True"
+                          Click="Menu_Show_Click"/>
             </MenuItem>
         </Menu>
 
